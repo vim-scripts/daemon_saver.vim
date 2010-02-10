@@ -1,8 +1,8 @@
 " ============================================================================
 " File:					daemon_saver.vim
 " Maintainer:		Krzysztof Szatan <k.szatan at gmail dot com>
-" Version:			1.0
-" Last Change:	7rd February, 2010
+" Version:			1.1
+" Last Change:	9rd February, 2010
 "
 " Description:	
 " FreeBSD daemon screensaver for Vim.	Based on matrix.vim by Don Yang,
@@ -113,8 +113,13 @@ function! s:Init() "{{{
 	let s:o_wmw = &wmw
 	set wmh=1
 	set wmw=1
+	let s:o_ssop = &ssop
+	set ssop=
 	exec 'mksession! ' . s:session_file
 	let s:num_orig_win = winnr("$")
+
+	let s:o_hid = &hid
+	set hid
 
 	" move to top window, so created window will become window 1,
 	" then attempt to create new window
@@ -176,7 +181,7 @@ function! s:Init() "{{{
 
 	" Remember gui cursor color. 
 	redir => cursor_color
-	silent! hi Normal 
+	silent! hi Cursor
 	redir END
 	let s:cursor_bg = matchstr(cursor_color, 'guibg=\S*') 
 	let s:cursor_fg = matchstr(cursor_color, 'guifg=\S*') 
@@ -301,7 +306,8 @@ function! s:Cleanup() "{{{
 	let &smd = s:o_smd
 	let &so = s:o_so
 	let &ve = s:o_ve
-	unlet s:o_ch s:o_ls s:o_lz s:o_siso s:o_sm s:o_smd s:o_so s:o_ve
+	let &hid = s:o_hid
+	unlet s:o_ch s:o_ls s:o_lz s:o_siso s:o_sm s:o_smd s:o_so s:o_ve s:o_hid
 
 	" Restore colors
 	exec "hi Normal " . s:normal_bg . " " . s:normal_gbg
@@ -315,6 +321,10 @@ function! s:Cleanup() "{{{
 	"Restore window min sizes
 	let &wmh = s:o_wmh
 	let &wmw = s:o_wmw
+
+	let &ssop = s:o_ssop
+
+	unlet s:normal_bg s:normal_gbg s:cursor_bg s:cursor_fg s:o_wmh s:o_wmw
 endfunction "}}}
 function! s:GetDaemonParams() "{{{
 	let daemon = {}
