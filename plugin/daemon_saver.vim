@@ -1,8 +1,8 @@
 " ============================================================================
 " File:					daemon_saver.vim
 " Maintainer:		Krzysztof Szatan <k.szatan at gmail dot com>
-" Version:			1.1
-" Last Change:	9rd February, 2010
+" Version:			2.0
+" Last Change:	11th February, 2010
 "
 " Description:	
 " FreeBSD daemon screensaver for Vim.	Based on matrix.vim by Don Yang,
@@ -113,8 +113,25 @@ function! s:Init() "{{{
 	let s:o_wmw = &wmw
 	set wmh=1
 	set wmw=1
+
+	" Check for NERDTree
+	if exists("t:NERDTreeBufName")
+		let s:nerd_num = bufwinnr(t:NERDTreeBufName)
+	else
+		let s:nerd_num = -1
+	endif
+	if s:nerd_num != -1
+		NERDTreeToggle
+	endif
+
+	" Check for TagList
+	let s:tlist_num = bufwinnr(g:TagList_title)
+	if s:tlist_num != -1
+		TlistToggle
+	endif
+
 	let s:o_ssop = &ssop
-	set ssop=
+	set ssop=blank,buffers,folds,globals,help,unix,winsize,localoptions,options
 	exec 'mksession! ' . s:session_file
 	let s:num_orig_win = winnr("$")
 
@@ -317,6 +334,18 @@ function! s:Cleanup() "{{{
 	exec 'source ' . s:session_file
 	exec 'bwipe ' . s:newbuf
 	unlet s:newbuf
+
+	" Restore NERDTree
+	if s:nerd_num != -1
+		NERDTreeToggle
+	endif
+
+	" Restore TagList
+	if s:tlist_num != -1
+		TlistToggle
+	endif
+
+	unlet s:tlist_num s:nerd_num
 
 	"Restore window min sizes
 	let &wmh = s:o_wmh
