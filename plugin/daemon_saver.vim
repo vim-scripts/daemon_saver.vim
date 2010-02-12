@@ -1,8 +1,8 @@
 " ============================================================================
 " File:					daemon_saver.vim
 " Maintainer:		Krzysztof Szatan <k.szatan at gmail dot com>
-" Version:			2.0
-" Last Change:	11th February, 2010
+" Version:			2.1
+" Last Change:	12th February, 2010
 "
 " Description:	
 " FreeBSD daemon screensaver for Vim.	Based on matrix.vim by Don Yang,
@@ -205,6 +205,7 @@ function! s:Init() "{{{
 
 	" Set colors
 	hi Normal ctermbg=Black guibg=Black
+	hi Normal ctermbg=Black guibg=Black
 	hi Cursor guibg=Black guifg=Black
 	hi DaemonNormal ctermfg=Red ctermbg=Black guifg=Red guibg=#000000
 	hi DaemonIris ctermfg=Blue ctermbg=Black guifg=Blue guibg=#000000
@@ -335,6 +336,16 @@ function! s:Cleanup() "{{{
 	exec 'bwipe ' . s:newbuf
 	unlet s:newbuf
 
+	"Restore window min sizes
+	let &wmh = s:o_wmh
+	let &wmw = s:o_wmw
+
+	let &ssop = s:o_ssop
+
+	unlet s:normal_bg s:normal_gbg s:cursor_bg s:cursor_fg s:o_wmh s:o_wmw
+	
+	syntax on
+
 	" Restore NERDTree
 	if s:nerd_num != -1
 		NERDTreeToggle
@@ -346,14 +357,6 @@ function! s:Cleanup() "{{{
 	endif
 
 	unlet s:tlist_num s:nerd_num
-
-	"Restore window min sizes
-	let &wmh = s:o_wmh
-	let &wmw = s:o_wmw
-
-	let &ssop = s:o_ssop
-
-	unlet s:normal_bg s:normal_gbg s:cursor_bg s:cursor_fg s:o_wmh s:o_wmw
 endfunction "}}}
 function! s:GetDaemonParams() "{{{
 	let daemon = {}
